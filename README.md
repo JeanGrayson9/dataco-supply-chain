@@ -1,45 +1,52 @@
-# DataCo Supply Chain Analysis
+# DataCo Supply Chain Analysis | Análisis de Cadena de Suministro
 
-**End-to-end supply chain analysis** using the DataCo SMART SUPPLY CHAIN dataset (Kaggle, ~180K rows). The project covers ABC/XYZ classification, Safety Stock and Reorder Point calculations, and an executive dashboard built in Excel and Power BI.
-
----
-
-## Objectives
-
-- Classify the SKU portfolio by revenue impact (ABC) and demand variability (XYZ)
-- Calculate Safety Stock and Reorder Point per SKU using a dual-variability formula
-- Identify systemic delivery and profitability issues in the order data
-- Build an interactive executive dashboard to communicate findings
+> **EN** | Supply chain inventory analysis using ABC/XYZ classification, Safety Stock, and Reorder Point calculations — built as a portfolio project demonstrating applied supply chain analytics.
+>
+> **ES** | Análisis de inventario en cadena de suministro mediante clasificación ABC/XYZ, Stock de Seguridad y Punto de Reorden — proyecto de portafolio que demuestra analítica aplicada de supply chain.
 
 ---
 
-## Dataset
+## 🇺🇸 English
 
-**Source:** [DataCo SMART SUPPLY CHAIN FOR BIG DATA ANALYSIS](https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis) — Kaggle  
-**Size:** ~180,000 order-line records  
-**Note:** The dataset is structured at the order-line level, so demand per SKU averages ~1 unit. Safety Stock values are therefore driven primarily by lead time variability, not demand variability. This is documented and expected given the dataset structure.
+### Project Description
+
+This project applies core supply chain analytics methodologies to the **DataCo Smart Supply Chain** dataset (Kaggle, ~180,000 rows). The goal is to segment inventory by revenue impact and demand behavior, then calculate optimal safety stock and reorder points for each SKU — translating raw transactional data into actionable inventory decisions.
+
+The analysis was built end-to-end: from raw data cleaning in Python/Excel, through statistical calculations, to an interactive Excel dashboard and a Power BI report.
 
 ---
 
-## Methodology
+### Dataset
 
-### ABC Classification
-SKUs ranked by cumulative revenue contribution:
+- **Source:** [DataCo SMART SUPPLY CHAIN FOR BIG DATA ANALYSIS — Kaggle](https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis)
+- **Size:** ~180,000 order-line rows
+- **Scope:** Multi-category consumer goods — Apparel, Fanshop, Golf, Pet Shop, and more
+- **Note:** The dataset is structured at the order-line level. Demand per SKU was derived by aggregating order quantities; lead time variability was sourced from the dataset's shipping fields.
+
+---
+
+### Methodology & Analysis
+
+#### 1. ABC Classification
+SKUs were ranked by total revenue contribution and segmented into three tiers:
+
 | Class | SKUs | Criteria |
 |-------|------|----------|
-| A | 7 | Top 80% of revenue |
-| B | 16 | Next 15% of revenue |
-| C | 95 | Remaining 5% of revenue |
+| A | 7 | Top revenue contributors (~80% of total) |
+| B | 16 | Mid-tier contributors |
+| C | 95 | Long-tail SKUs |
 
-### XYZ Classification
-SKUs ranked by coefficient of variation (CV) of demand:
+#### 2. XYZ Classification
+Demand variability per SKU was measured using the **Coefficient of Variation (CV)**:
+
 | Class | Criteria |
 |-------|----------|
 | X | CV ≤ 0.5 — stable demand |
-| Y | 0.5 < CV ≤ 1.0 — variable demand |
-| Z | CV > 1.0 — highly irregular demand |
+| Y | 0.5 < CV ≤ 1.0 — moderate variability |
+| Z | CV > 1.0 — high variability |
 
-**ABC-XYZ Matrix results:**
+#### 3. ABC-XYZ Matrix
+Combined matrix (118 SKUs total):
 
 | | X | Y | Z |
 |---|---|---|---|
@@ -47,106 +54,93 @@ SKUs ranked by coefficient of variation (CV) of demand:
 | **B** | 2 | 3 | 11 |
 | **C** | 0 | 42 | 53 |
 
-### Safety Stock & Reorder Point
-Dual-variability formula accounting for both demand and lead time uncertainty:
+**Key insight:** All 7 Class A SKUs fall into the AX segment — high revenue, stable demand, lowest safety stock requirements. These are the highest-priority items for inventory management.
+
+#### 4. Safety Stock & Reorder Point
+Calculated using the **dual-variability formula**, which accounts for both demand and lead time uncertainty:
 
 ```
 SS = Z × √(LT_avg × σ_demand² + demand_avg² × σ_LT²)
 ROP = (demand_avg × LT_avg) + SS
 ```
 
-Where Z = 1.65 (95% service level).
+- **Z-score** based on 95% Customer Service Level (CSL) → Z = 1.645
+- Lead time variability was the primary SS driver given the order-line dataset structure
 
 ---
 
-## Key Findings
+### Key Findings
 
-- **57.28% global late delivery rate** — systemic across all geographies and shipping modes, indicating a structural operations issue rather than a regional one
-- **First Class shipping = 100% late deliveries** — the premium shipping mode underperforms every other option
-- **~18.71% of orders are unprofitable** — negative margin orders concentrated in specific product categories
-- **AX SKUs (7 products)** represent the highest-priority inventory segment: high revenue + stable demand + low safety stock requirements
-
----
-
-## Tools
-
-| Tool | Use |
-|------|-----|
-| Microsoft Excel | Data cleaning, ABC/XYZ classification, SS/ROP calculations, dashboard |
-| Microsoft Power BI | Interactive executive dashboard with DAX measures |
+- **7 AX SKUs** represent the highest-priority inventory segment: high revenue + stable demand + lowest safety stock requirements → prime candidates for lean replenishment policies
+- **11 BZ SKUs** require the most safety stock relative to their revenue contribution — candidates for demand smoothing or supplier renegotiation
+- **53 CZ SKUs** (long-tail, high variability) account for the majority of the catalog while contributing minimally to revenue — rationalization opportunity
+- Safety stock levels are driven primarily by **lead time variability**, not demand variability, given the dataset's order-line granularity
 
 ---
 
-## Repository Structure
+### Tools Used
 
-```
-dataco-supply-chain/
-│
-├── data/
-│   └── (dataset not included — download from Kaggle link above)
-│
-├── excel/
-│   └── DataCoSupplyChainDataset.xlsx   # ABC/XYZ classification + SS/ROP + dashboard
-│
-├── powerbi/
-│   └── DataCoSupply PowerBI.pbix       # Power BI executive dashboard
-│
-└── README.md
-```
+| Tool | Purpose |
+|------|---------|
+| Python (pandas) | Data cleaning, ABC/XYZ calculations, SS/ROP computation |
+| Microsoft Excel | Dashboard: KPI cards, ABC Pareto chart, SS/ROP summary table |
+| Power BI (DAX) | Interactive report with slicers, KPI visuals, and inventory matrix |
+| GitHub | Version control and portfolio publishing |
 
 ---
 
-## Contact
+### Contact
 
-**Julian Suarez**  
-Supply Chain Data Analyst  
-[GitHub](https://github.com/JeanGrayson9) · [LinkedIn](https://www.linkedin.com/in/julian-suarez-85a5543b6) · Mazatlán, México
+**Julian Suarez**
+Supply Chain Data Analyst | Freelance & Remote
+- 📧 [saintjulian9@gmail.com]
+- 💼 [www.linkedin.com/in/juliansuarez9]
+- 🐙 [github.com/JeanGrayson9](https://github.com/JeanGrayson9)
 
 ---
 ---
 
-# Análisis de Cadena de Suministro — DataCo
+## 🇲🇽 Español
 
-**Análisis end-to-end de cadena de suministro** usando el dataset DataCo SMART SUPPLY CHAIN (Kaggle, ~180K filas). El proyecto cubre clasificación ABC/XYZ, cálculo de Stock de Seguridad y Punto de Reorden, y un dashboard ejecutivo construido en Excel y Power BI.
+### Descripción del Proyecto
 
----
+Este proyecto aplica metodologías core de analítica de cadena de suministro al dataset **DataCo Smart Supply Chain** (Kaggle, ~180,000 filas). El objetivo es segmentar el inventario por impacto en ingresos y comportamiento de demanda, y calcular el stock de seguridad y punto de reorden óptimos por SKU — traduciendo datos transaccionales en decisiones concretas de inventario.
 
-## Objetivos
-
-- Clasificar el portafolio de SKUs por impacto en ingresos (ABC) y variabilidad de demanda (XYZ)
-- Calcular Stock de Seguridad y Punto de Reorden por SKU usando fórmula de doble variabilidad
-- Identificar problemas sistémicos de entrega y rentabilidad en los datos de órdenes
-- Construir un dashboard ejecutivo interactivo para comunicar los hallazgos
+El análisis fue construido de extremo a extremo: desde la limpieza de datos en Python/Excel, pasando por los cálculos estadísticos, hasta un dashboard interactivo en Excel y un reporte en Power BI.
 
 ---
 
-## Dataset
+### Dataset
 
-**Fuente:** [DataCo SMART SUPPLY CHAIN FOR BIG DATA ANALYSIS](https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis) — Kaggle  
-**Tamaño:** ~180,000 registros a nivel línea de orden  
-**Nota:** El dataset está estructurado a nivel línea de orden, por lo que la demanda promedio por SKU es ~1 unidad. Los valores de Stock de Seguridad están impulsados principalmente por la variabilidad del lead time, no de la demanda. Esto está documentado y es esperado dada la estructura del dataset.
+- **Fuente:** [DataCo SMART SUPPLY CHAIN FOR BIG DATA ANALYSIS — Kaggle](https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis)
+- **Tamaño:** ~180,000 filas a nivel línea de orden
+- **Alcance:** Bienes de consumo multicategoría — Apparel, Fanshop, Golf, Pet Shop, entre otros
+- **Nota:** El dataset está estructurado a nivel línea de orden. La demanda por SKU se derivó agregando cantidades de orden; la variabilidad de lead time se obtuvo de los campos de envío del dataset.
 
 ---
 
-## Metodología
+### Metodología y Análisis
 
-### Clasificación ABC
-SKUs ordenados por contribución acumulada a ingresos:
+#### 1. Clasificación ABC
+Los SKUs fueron ordenados por contribución total de ingresos y segmentados en tres niveles:
+
 | Clase | SKUs | Criterio |
 |-------|------|----------|
-| A | 7 | Top 80% de ingresos |
-| B | 16 | Siguiente 15% de ingresos |
-| C | 95 | 5% restante de ingresos |
+| A | 7 | Principales generadores de ingreso (~80% del total) |
+| B | 16 | Contribución media |
+| C | 95 | SKUs de cola larga |
 
-### Clasificación XYZ
-SKUs ordenados por coeficiente de variación (CV) de demanda:
+#### 2. Clasificación XYZ
+La variabilidad de demanda por SKU se midió con el **Coeficiente de Variación (CV)**:
+
 | Clase | Criterio |
 |-------|----------|
 | X | CV ≤ 0.5 — demanda estable |
-| Y | 0.5 < CV ≤ 1.0 — demanda variable |
-| Z | CV > 1.0 — demanda altamente irregular |
+| Y | 0.5 < CV ≤ 1.0 — variabilidad moderada |
+| Z | CV > 1.0 — alta variabilidad |
 
-**Matriz ABC-XYZ:**
+#### 3. Matriz ABC-XYZ
+Matriz combinada (118 SKUs en total):
 
 | | X | Y | Z |
 |---|---|---|---|
@@ -154,57 +148,45 @@ SKUs ordenados por coeficiente de variación (CV) de demanda:
 | **B** | 2 | 3 | 11 |
 | **C** | 0 | 42 | 53 |
 
-### Stock de Seguridad y Punto de Reorden
-Fórmula de doble variabilidad considerando incertidumbre de demanda y lead time:
+**Hallazgo clave:** Los 7 SKUs Clase A caen en el segmento AX — alto ingreso, demanda estable, menores requerimientos de stock de seguridad. Son los ítems de mayor prioridad para la gestión de inventario.
+
+#### 4. Stock de Seguridad y Punto de Reorden
+Calculados con la **fórmula de doble variabilidad**, que considera tanto la incertidumbre de demanda como la de lead time:
 
 ```
 SS = Z × √(LT_prom × σ_demanda² + demanda_prom² × σ_LT²)
 ROP = (demanda_prom × LT_prom) + SS
 ```
 
-Donde Z = 1.65 (nivel de servicio 95%).
+- **Z-score** basado en 95% de Nivel de Servicio al Cliente (CSL) → Z = 1.645
+- La variabilidad de lead time fue el principal driver del SS, dado que el dataset opera a nivel línea de orden
 
 ---
 
-## Hallazgos Clave
+### Hallazgos Clave
 
-- **57.28% de tasa global de entregas tardías** — sistémica en todas las geografías y modos de envío, indicando un problema estructural de operaciones y no un problema regional
-- **Envío First Class = 100% de entregas tardías** — el modo de envío premium tiene el peor desempeño de todos
-- **~18.71% de órdenes son no rentables** — órdenes con margen negativo concentradas en categorías específicas
-- **SKUs AX (7 productos)** representan el segmento de inventario de mayor prioridad: alto ingreso + demanda estable + bajos requerimientos de stock de seguridad
+- **7 SKUs AX** representan el segmento de inventario de mayor prioridad: alto ingreso + demanda estable + menores requerimientos de stock de seguridad → candidatos prioritarios para políticas de reabastecimiento lean
+- **11 SKUs BZ** requieren el mayor stock de seguridad relativo a su contribución de ingresos — candidatos para suavización de demanda o renegociación con proveedores
+- **53 SKUs CZ** (cola larga, alta variabilidad) conforman la mayoría del catálogo con contribución mínima a ingresos — oportunidad de racionalización de portafolio
+- Los niveles de stock de seguridad están impulsados principalmente por la **variabilidad de lead time**, no por la variabilidad de demanda, dada la granularidad del dataset
 
 ---
 
-## Herramientas
+### Herramientas Utilizadas
 
 | Herramienta | Uso |
 |-------------|-----|
-| Microsoft Excel | Limpieza de datos, clasificación ABC/XYZ, cálculos SS/ROP, dashboard |
-| Microsoft Power BI | Dashboard ejecutivo interactivo con medidas DAX |
+| Python (pandas) | Limpieza de datos, cálculos ABC/XYZ, cómputo de SS/ROP |
+| Microsoft Excel | Dashboard: tarjetas KPI, gráfico Pareto ABC, tabla resumen SS/ROP |
+| Power BI (DAX) | Reporte interactivo con slicers, visuales KPI y matriz de inventario |
+| GitHub | Control de versiones y publicación de portafolio |
 
 ---
 
-## Estructura del Repositorio
+### Contacto
 
-```
-dataco-supply-chain/
-│
-├── data/
-│   └── (dataset no incluido — descargar desde el enlace de Kaggle)
-│
-├── excel/
-│   └── DataCoSupplyChainDataset.xlsx   # Clasificación ABC/XYZ + SS/ROP + dashboard
-│
-├── powerbi/
-│   └── DataCoSupply PowerBI.pbix       # Dashboard ejecutivo Power BI
-│
-└── README.md
-```
-
----
-
-## Contacto
-
-**Julian Suarez**  
-Analista de Datos — Cadena de Suministro  
-[GitHub](https://github.com/JeanGrayson9) · [LinkedIn](https://www.linkedin.com/in/julian-suarez-85a5543b6) · Mazatlán, México
+**Julian Suarez**
+Analista de Datos — Cadena de Suministro | Freelance & Remoto
+- 📧 [saintjulian9@gmail.com]
+- 💼 [www.linkedin.com/in/juliansuarez9]
+- 🐙 [github.com/JeanGrayson9](https://github.com/JeanGrayson9)
